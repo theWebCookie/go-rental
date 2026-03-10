@@ -38,7 +38,7 @@ export const GET_CAR_BY_ID = gql`
       address
       year
       power
-      milleage
+      mileage
       brand
       transmission
       fuelType

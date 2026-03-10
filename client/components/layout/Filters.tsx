@@ -2,14 +2,44 @@ import { Card, CardHeader } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
 import { Search } from 'lucide-react';
 import { Input } from '../ui/input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { CarBrand, CarCategories, CarTransmissions } from '@go-rental/shared';
+
+const categories = Array.isArray(CarCategories) ? CarCategories : Object.values(CarCategories || {});
+const brands = Array.isArray(CarBrand) ? CarBrand : Object.values(CarBrand || {});
+const transmissions = Array.isArray(CarTransmissions) ? CarTransmissions : Object.values(CarTransmissions || {});
 
 const Filters = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const searchParams = useSearchParams();
+  const [filters, setFilters] = useState({
+    category: searchParams.get('category'),
+    brand: searchParams.get('brand'),
+    transmission: searchParams.get('transmission'),
+  });
   const router = useRouter();
   const pathname = usePathname();
+
+  const handleCheckboxChange = (type: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [type]: prev[type] === value ? null : value,
+    }));
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+    router.push(`${pathname}?${params.toString()}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,9 +54,6 @@ const Filters = () => {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const carCategories = ['Sedan', 'SUV', 'Coupe', 'Convertible'];
-  const carBrands = ['Toyota', 'Honda', 'Ford', 'Chevrolet'];
-  const carTransmissions = ['Automatic', 'Manual'];
   return (
     <div>
       <Card>
@@ -50,10 +77,16 @@ const Filters = () => {
               </div>
 
               <div className='filter-section my-8'>
-                <h2 className='text-xl font-bold mt-4 my-3'>Car Type</h2>
-                {carCategories?.map((category) => (
+                <h2 className='text-xl font-bold mt-4 my-3'>Car Category</h2>
+                {categories?.map((category) => (
                   <div key={category} className='flex items-center space-x-2 my-2'>
-                    <Checkbox id='category' name='category' value={category} />
+                    <Checkbox
+                      id='category'
+                      name='category'
+                      value={category}
+                      checked={filters.category === category}
+                      onCheckedChange={() => handleCheckboxChange('category', category)}
+                    />
                     <label htmlFor='carType' className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
                       {category}
                     </label>
@@ -63,9 +96,15 @@ const Filters = () => {
 
               <div className='filter-section my-8'>
                 <h2 className='text-xl font-bold mt-4 my-3'>Select Brand</h2>
-                {carBrands?.map((brand) => (
+                {brands?.map((brand) => (
                   <div key={brand} className='flex items-center space-x-2 my-2'>
-                    <Checkbox id='brand' name='brand' value={brand} />
+                    <Checkbox
+                      id='brand'
+                      name='brand'
+                      value={brand}
+                      checked={filters.brand === brand}
+                      onCheckedChange={() => handleCheckboxChange('brand', brand)}
+                    />
                     <label htmlFor='carBrand' className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
                       {brand}
                     </label>
@@ -75,9 +114,15 @@ const Filters = () => {
 
               <div className='filter-section my-8'>
                 <h2 className='text-xl font-bold mt-4 my-3'>Transmission</h2>
-                {carTransmissions?.map((transmission) => (
+                {transmissions?.map((transmission) => (
                   <div key={transmission} className='flex items-center space-x-2 my-2'>
-                    <Checkbox id='transmission' name='transmission' value={transmission} />
+                    <Checkbox
+                      id='transmission'
+                      name='transmission'
+                      value={transmission}
+                      checked={filters.transmission === transmission}
+                      onCheckedChange={() => handleCheckboxChange('transmission', transmission)}
+                    />
                     <label
                       htmlFor='carTransmission'
                       className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'

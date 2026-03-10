@@ -4,7 +4,7 @@
 import ListHomeCars from '@/components/car/ListHomeCars';
 import { useQuery } from '@apollo/client/react';
 import { GET_ALL_CARS } from './graphql/queries/car.queries';
-import { ICar } from '@go-rental/shared';
+import { CarStatus, ICar } from '@go-rental/shared';
 import Filters from '@/components/layout/Filters';
 import { useSearchParams } from 'next/navigation';
 
@@ -17,7 +17,18 @@ type TGetAllCarsData = {
 export default function Home() {
   const searchParams = useSearchParams();
   const query = searchParams.get('query');
+  const category = searchParams.get('category');
+  const brand = searchParams.get('brand');
+  const transmission = searchParams.get('transmission');
+
+  const filters = {
+    status: CarStatus.Active,
+    ...(category && { category }),
+    ...(brand && { brand }),
+    ...(transmission && { transmission }),
+  };
   const variables = {
+    filters,
     query,
   };
   const { data, loading, error } = useQuery<TGetAllCarsData>(GET_ALL_CARS, { variables });
