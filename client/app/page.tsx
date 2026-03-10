@@ -1,5 +1,4 @@
 'use client';
-// import Filters from "./layout/Filters";
 // import { LoadingSpinner } from "./layout/LoadingSpinner";
 import ListHomeCars from '@/components/car/ListHomeCars';
 import { useQuery } from '@apollo/client/react';
@@ -11,6 +10,10 @@ import { useSearchParams } from 'next/navigation';
 type TGetAllCarsData = {
   getAllCars: {
     cars: Array<ICar>;
+    pagination: {
+      totalCount: number;
+      resPerPage: number;
+    };
   };
 };
 
@@ -20,6 +23,7 @@ export default function Home() {
   const category = searchParams.get('category');
   const brand = searchParams.get('brand');
   const transmission = searchParams.get('transmission');
+  const page = parseInt(searchParams.get('page') || '1', 10);
 
   const filters = {
     status: CarStatus.Active,
@@ -30,6 +34,7 @@ export default function Home() {
   const variables = {
     filters,
     query,
+    page,
   };
   const { data, loading, error } = useQuery<TGetAllCarsData>(GET_ALL_CARS, { variables });
 
@@ -41,7 +46,7 @@ export default function Home() {
         <Filters />
       </div>
       <div className='grid auto-rows-max items-start gap-4 md:gap-8 md:col-span-4 lg:col-span-4 flex-col'>
-        <ListHomeCars cars={data?.getAllCars.cars} loading={loading} />
+        <ListHomeCars cars={data?.getAllCars.cars} loading={loading} pagination={data?.getAllCars?.pagination} />
       </div>
       <div className='md:col-span-6 lg:col-span-4 flex flex-col'>
         <div className='flex items-center justify-center h-screen'></div>

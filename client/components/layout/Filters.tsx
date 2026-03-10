@@ -2,7 +2,7 @@ import { Card, CardHeader } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
 import { Search } from 'lucide-react';
 import { Input } from '../ui/input';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CarBrand, CarCategories, CarTransmissions } from '@go-rental/shared';
 
@@ -13,33 +13,24 @@ const transmissions = Array.isArray(CarTransmissions) ? CarTransmissions : Objec
 const Filters = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const searchParams = useSearchParams();
-  const [filters, setFilters] = useState({
-    category: searchParams.get('category'),
-    brand: searchParams.get('brand'),
-    transmission: searchParams.get('transmission'),
-  });
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleCheckboxChange = (type: keyof typeof filters, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [type]: prev[type] === value ? null : value,
-    }));
+  const filters = {
+    category: searchParams.get('category'),
+    brand: searchParams.get('brand'),
+    transmission: searchParams.get('transmission'),
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    });
+  const handleCheckboxChange = (type: keyof typeof filters, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (params.get(type) === value) {
+      params.delete(type);
+    } else {
+      params.set(type, value);
+    }
     router.push(`${pathname}?${params.toString()}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
