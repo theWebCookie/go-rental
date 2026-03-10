@@ -77,7 +77,7 @@ export const carTypeDefs = gql`
   }
 
   type Query {
-    getAllCars(page: Int, filters: CarFilters, query: String): [PaginatedCars]
+    getAllCars(page: Int, filters: CarFilters, query: String): PaginatedCars
     getCarById(carId: ID!): Car
   }
 

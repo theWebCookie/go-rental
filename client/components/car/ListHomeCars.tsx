@@ -5,13 +5,18 @@ import Link from 'next/link';
 import CardItem from './CarItem';
 import { ICar } from '@go-rental/shared';
 import LoadingSpinner from '../layout/LoadingSpinner';
+import CustomPagination from '../layout/CustomPagination';
 
 interface IListHomeCarsProps {
   cars: Array<ICar> | undefined;
   loading: boolean;
+  pagination?: {
+    totalCount: number;
+    resPerPage: number;
+  };
 }
 
-const ListHomeCars = ({ cars, loading }: IListHomeCarsProps) => {
+const ListHomeCars = ({ cars, loading, pagination }: IListHomeCarsProps) => {
   if (loading) {
     return <LoadingSpinner size={60} fullScreen={true} />;
   }
@@ -34,6 +39,9 @@ const ListHomeCars = ({ cars, loading }: IListHomeCarsProps) => {
           <CardItem key={car.id} car={car} />
         ))}
       </div>
+      {pagination && pagination.totalCount > pagination.resPerPage && (
+        <CustomPagination totalCount={pagination.totalCount} resPerPage={pagination.resPerPage} />
+      )}
     </>
   );
 };

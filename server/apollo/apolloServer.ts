@@ -1,7 +1,7 @@
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express5';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { json, type Application } from 'express';
+import { type Application } from 'express';
 import { carTypeDefs } from '../graphql/typeDefs/car.typeDefs.ts';
 import { carResolvers } from '../graphql/resolvers/car.resolvers.ts';
 
@@ -22,5 +22,5 @@ export async function startApolloServer(app: Application) {
 
   await apolloServer.start();
 
-  app.use('/graphql', json(), expressMiddleware(apolloServer));
+  app.use('/graphql', expressMiddleware(apolloServer));
 }
